@@ -1,0 +1,37 @@
+CMAKE_MINIMUM_REQUIRED(VERSION 3.10)
+PROJECT(MAYA_PLUG)
+
+IF (NOT WIN32)
+	MESSAGE("********************only window are supported!**************************")
+	RETURN()
+ENDIF ()
+
+SET(CMAKE_CONFIGURATION_TYPES "Release;Debug" CACHE STRING "" FORCE)
+IF (MSVC)
+	MESSAGE("********************compiler msvc********************")
+	LIST(APPEND CMAKE_CXX_FLAGS "/Wall /std:c++14 /EHsc /openmp")
+	LIST(APPEND CMAKE_CXX_FLAGS_DEBUG "/Od")
+	LIST(APPEND CMAKE_CXX_FLAGS_RELEASE "/O2 /DNDEBUG")
+	# macro NDEBUG will remove all assert
+ENDIF ()
+
+# set(CMAKE_WINDOWS_EXPORT_ALL_SYMBOLS ON)
+
+ADD_COMPILE_OPTIONS(/DWIN32 /DNDEBUG /D_WINDOWS /DNT_PLUGIN /DREQUIRE_IOSTREAM /D_USRDLL /DMAYAPLUGIN1_EXPORTS)
+
+LINK_DIRECTORIES("C:/Program Files/Autodesk/Maya2020/lib")
+INCLUDE_DIRECTORIES("C:/Program Files/Autodesk/Maya2020/include")
+
+LINK_LIBRARIES(Foundation OpenMaya OpenMayaUI OpenMayaAnim OpenMayaFX OpenMayaRender Image opengl32)
+
+
+ADD_LIBRARY(HelloWorld SHARED plugin.cpp)
+SET_TARGET_PROPERTIES(HelloWorld
+	PROPERTIES
+	SUFFIX ".mll"
+	OUTPUT_NAME "hello"
+	LINK_FLAGS /EXPORT:initializePlugin
+	LINK_FLAGS /EXPORT:uninitializePlugin
+	ARCHIVE_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/lib"
+	LIBRARY_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/lib"
+	RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/bin")
