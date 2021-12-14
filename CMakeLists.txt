@@ -1,0 +1,37 @@
+cmake_minimum_required(VERSION 3.4)
+project(DoublerNode)
+
+set(CMAKE_CXX_STANDARD 11)
+
+ADD_COMPILE_OPTIONS(/DWIN32 /DNDEBUG /D_WINDOWS /DNT_PLUGIN /DREQUIRE_IOSTREAM /D_USRDLL /DMAYAPLUGIN1_EXPORTS)
+
+LINK_DIRECTORIES("C:/Program Files/Autodesk/Maya2020/lib")
+INCLUDE_DIRECTORIES("C:/Program Files/Autodesk/Maya2020/include")
+
+LINK_LIBRARIES(Foundation OpenMaya OpenMayaUI OpenMayaAnim OpenMayaFX OpenMayaRender Image opengl32)
+
+set(OUTPUT_DIRECTORY ${PROJECT_SOURCE_DIR}/build)
+if(NOT EXISTS ${OUTPUT_DIRECTORY})
+    file(MAKE_DIRECTORY ${OUTPUT_DIRECTORY})
+endif()
+set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${OUTPUT_DIRECTORY})
+
+
+if (NOT DEFINED MAYA_VERSION)
+    set(MAYA_VERSION 2020 CACHE STRING "Maya Version")
+endif()
+
+# Set Project source directory
+set(PROJECT_SOURCE_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/plugin)
+set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${PROJECT_SOURCE_DIRECTORY})
+
+file(GLOB SOURCE_FILES
+  "${PROJECT_SOURCE_DIRECTORY}/*.h"
+  "${PROJECT_SOURCE_DIRECTORY}/*.cpp"
+)
+
+find_package(Maya REQUIRED)
+add_library(${PROJECT_NAME} SHARED ${SOURCE_FILES})
+target_include_directories(${PROJECT_NAME} PRIVATE Maya::Maya)
+target_link_libraries(${PROJECT_NAME} PRIVATE Maya::Maya)
+MAYA_PLUGIN(${PROJECT_NAME})
